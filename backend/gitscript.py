@@ -20,4 +20,20 @@ def update_cloned_repo(repo_path, repo_url):
     except Exception as e:
         print(f"Error updating repository: {e}")
 
-update_cloned_repo(LOCAL_REPO_PATH, GITHUB_REPO_URL)
+
+def process_directories_only(repo_path):
+    """Loop through all directories, including hidden, and print them."""
+    for root, dirs, files in os.walk(repo_path, topdown=False, followlinks=True):  # Follow symlinks if present
+        print(f"Processing directory: {root}")  # Log the current directory
+
+        # Logging subdirectories and checking if they are hidden
+        # if dirs:
+        #     print(f"Subdirectories found in {root}:")
+        #     for dir in dirs:
+        #         dir_path = os.path.join(root, dir)
+        #         print(f"- {dir_path}")  # Print the path of each subdirectory
+        #         if dir.startswith('.'):
+        #             print(f"  (Hidden directory: {dir})")
+
+# update_cloned_repo(LOCAL_REPO_PATH, GITHUB_REPO_URL)
+process_directories_only(LOCAL_REPO_PATH)

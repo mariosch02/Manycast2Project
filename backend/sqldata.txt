@@ -1,0 +1,71 @@
+CREATE TABLE IPv4(
+    Prefix TEXT PRIMARY KEY,
+    MAnycast_ICMPv4 TEXT,
+    MAnycast_TCPv4 TEXT,
+    MAnycast_UDPv4 TEXT,
+    iGreedyICMPv4 TEXT,
+    iGreedyTCPv4 TEXT,
+    MAnycast_ICMPv4_Count INT,
+    MAnycast_TCPv4_Count INT,
+    MAnycast_UDPv4_Count INT,
+    iGreedyICMPv4_Count INT,
+    iGreedyTCPv4_Count INT,
+    Date DATE,
+    FOREIGN KEY (Date, Prefix) REFERENCES LocationIPv4(Date, Prefix)
+);
+
+CREATE TABLE LocationIPv4(
+    Prefix TEXT,
+    Date DATE,
+    Long FLOAT,
+    Latitude FLOAT,
+    City TEXT,
+    CodeCountry TEXT,
+    Id TEXT,
+    Count INT,
+    PRIMARY KEY(Date,Prefix)
+);
+
+
+CREATE TABLE IPv6 (
+    Prefix TEXT PRIMARY KEY,
+    MAnycast_ICMPv6 TEXT,
+    MAnycast_TCPv6 TEXT,
+    MAnycast_UDPv6 TEXT,
+    iGreedyICMPv6 TEXT,
+    iGreedyTCPv6 TEXT,
+    MAnycast_ICMPv6_Count INT,
+    MAnycast_TCPv6_Count INT,
+    MAnycast_UDPv6_Count INT,
+    iGreedyICMPv6_Count INT,
+    iGreedyTCPv6_Count INT,
+    Count INT,
+    CodeCountry TEXT,
+    Id TEXT,
+    FOREIGN KEY (Date, Prefix) REFERENCES LocationIPv6(Date, Prefix)
+);
+
+CREATE TABLE LocationIPv6(
+    Prefix TEXT,
+    Date DATE,
+    Long FLOAT,
+    Latitude FLOAT,
+    City TEXT,
+    PRIMARY KEY(Date,Prefix)
+);
+
+CREATE TABLE Stats(
+    PRIMARY KEY Date DATE,
+    ICMPv4_GCD_Nodes INT,
+    ICMPv6_GCD_Nodes INT ,
+    Anycast_ICMPv4_Count INT,
+    Anycast_TCPv4_Count INT ,
+    Anycast_UDPv4_Count INT ,
+    GCD_ICMPv4_Count INT ,
+    GCD_TCPv4_Count INT ,
+    Anycast_ICMPv6_Count INT ,
+    Anycast_TCPv6_Count INT ,
+    Anycast_UDPv6_Count INT ,
+    GCD_ICMPv6_Count INT ,
+    GCD_TCPv6_Count INT 
+);

@@ -1,0 +1,225 @@
+/* General Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Open Sans', sans-serif; /* Modern Font */
+  background-color: #EEEEEE; /* Light gray background */
+}
+
+/* Filter Section */
+.filter-section {
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px 20px;
+  background-color: #FFFFFF; /* White background */
+  border-bottom: 1px solid #CCCCCC; /* Subtle light border */
+  width: 100%;
+  box-sizing: border-box;
+  gap: 10px; /* Reduce gap between filter items */
+  z-index: 1000;
+  position: relative;
+}
+
+.filter-item {
+  margin-right: 10px;
+}
+
+input, button, .react-datepicker-wrapper input {
+  font-family: 'Open Sans', sans-serif;
+  padding: 8px 12px;
+  border: 1px solid #508C9B; /* Light Blue border */
+  border-radius: 5px;
+  background-color: #FFFFFF; /* White background for inputs/buttons */
+  transition: 0.3s;
+}
+
+input:focus, .react-datepicker-wrapper input:focus {
+  border-color: #508C9B; /* Light Blue border focus */
+  box-shadow: 0 0 5px rgba(80, 140, 155, 0.3); /* Soft blue shadow */
+}
+
+button {
+  background-color: #134B70; /* Purple color for buttons */
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 8px 12px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #201E43; /* Dark Blue for button hover */
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(80, 140, 155, 0.5); /* Light Blue focus shadow */
+}
+
+/* Ensuring the calendar appears above the map */
+.react-datepicker-popper {
+  z-index: 2000 !important; /* Ensure the calendar is above other content */
+}
+
+/* Content Section */
+.content {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* Map Section and Table Section */
+.map-section, .table-section {
+  flex: 2.1; /* Same width for map and table */
+  height: 100%;
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+}
+
+/* Centered Table */
+table {
+  width: 60%; /* Adjust width of the table */
+  border-collapse: collapse;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Light shadow for the table */
+}
+
+table thead {
+  background-color: #134B70;
+  color: #ffffff;
+}
+
+table th, table td {
+  padding: 10px 15px;
+  border: 1px solid #CCCCCC;
+  text-align: left;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f8f8f8; /* Light alternating row color */
+}
+
+table tbody tr:hover {
+  background-color: #e0f4f5; /* Subtle hover effect for rows */
+}
+
+table td {
+  color: #333333;
+}
+
+table th {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Info Section */
+.info-section {
+  flex: 0.7; /* Reduce the width of the information section */
+  padding: 20px;
+  background-color: #FFFFFF; /* White background for clean look */
+  border-left: 1px solid #CCCCCC; /* Subtle light border */
+  overflow-y: auto;
+  box-shadow: -2px 0 4px rgba(224, 224, 224, 0.5); /* Soft shadow */
+}
+
+/* General Information Header */
+.info-section h2 {
+  margin-top: 0;
+  color: #201E43; /* Dark blue for contrast */
+}
+
+.info-section p {
+  color: #134B70; /* Purple for secondary text */
+}
+
+/* Selected Date with Calendar Icon */
+.selected-date {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-top: 0%;
+  
+}
+
+.calendar-icon {
+  margin-right: 20px;
+  color: #134B70; /* Same purple for consistency */
+  font-size: 2rem;
+}
+
+.selected-date span {
+  font-size: 27px;
+  color: #134B70;
+}
+
+/* Characterization Table */
+.characterization-table {
+  margin-top: 30px;
+
+  font-size:110%
+}
+
+/* Toggle Switch Container */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 70px;
+  height: 34px;
+  background-color: #ccc;
+  border-radius: 34px;
+  cursor: pointer;
+  transition: background-color 0.4s;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.4s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .toggle-slider {
+  transform: translateX(36px);
+}
+
+.toggle-switch.on {
+  background-color: #134B70;
+}
+
+/* Icons inside the toggle switch */
+.toggle-icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.map-icon {
+  left: 10px;
+  color: white;
+}
+
+.table-icon {
+  right: 10px;
+  color: white;
+}
+

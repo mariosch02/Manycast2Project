@@ -20,15 +20,13 @@ const FilterSection = ({ startDate, setStartDate, handlePreviousDay, handleNextD
 
   const formattedDate = formatDate(startDate);
 
-  // Updated handleSearchClick to use searchTerm
   const handleSearchClick = () => {
-    // Ensure searchTerm is part of the API call
     const apiUrl = `http://localhost:5000/api/ipv6/${formattedDate}/${searchTerm}`;
     fetch(apiUrl)
-      .then((res) => res.json())  // Parse the JSON response
+      .then((res) => res.json()) 
       .then((data) => {
-        console.log(data);  // Log the response for debugging
-        setResponse(data);  // Set the response in state to display it in the UI
+        console.log(data); 
+        setResponse(data);  
         console.log("DATA "+  response);
         handleApiResponse(data)
       })

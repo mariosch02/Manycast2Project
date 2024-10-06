@@ -31,11 +31,11 @@ const App = () => {
 
   useEffect(() => {
     if (dataResponse && dataResponse.length > 0) {
-      console.log("Ouuu Thkiaole ", dataResponse); // This will log when the state changes
+      console.log("Ouuu Thkiaole ", dataResponse); 
 
       const newAnycastSites = {
         prefix: dataResponse[0].Prefix,
-        count: dataResponse[0].Count, // Assuming there is a Count property in dataResponse
+        count: dataResponse[0].Count, 
         characterization: {
           MAnycastICMPv6: { anycast: dataResponse[0].MAnycast_ICMPv6, instances: dataResponse[0].MAnycast_ICMPv6_Count },
           MAnycastTCPv6: { anycast: dataResponse[0].MAnycast_TCPv6, instances: dataResponse[0].MAnycast_TCPv6_Count },
@@ -52,7 +52,7 @@ const App = () => {
       };
 
       setAnycastSites(newAnycastSites);
-      console.log("Ouuu Thkiaole ", newAnycastSites.instances[0].position[0]); // This will log the city of the first instance
+      console.log("Ouuu Thkiaole ", newAnycastSites.instances[0].position[0]); 
     }
   }, [dataResponse]);
 

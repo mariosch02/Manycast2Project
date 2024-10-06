@@ -1,7 +1,6 @@
 import React from 'react';
 
 const CharacterizationTable = ({ characterization }) => {
-  // Ensure characterization is not null or undefined before using it
   const rows = [
     { protocol: 'MAnycast ICMPv6', data: characterization?.MAnycastICMPv6 },
     { protocol: 'MAnycast TCPv6', data: characterization?.MAnycastTCPv6 },

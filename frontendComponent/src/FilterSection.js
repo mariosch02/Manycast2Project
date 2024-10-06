@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMap, faTable, faSearch } from '@fortawesome/free-solid-svg-icons';
 import React, { useState, useEffect } from 'react';
 
-const FilterSection = ({ startDate, setStartDate, handlePreviousDay, handleNextDay, searchTerm, setSearchTerm, view, setView, handleSearch }) => {
+const FilterSection = ({ startDate, setStartDate, handlePreviousDay, handleNextDay, searchTerm, setSearchTerm, view, setView, handleSearch, handleApiResponse }) => {
   
   // Initialize the response state here
   const [response, setResponse] = useState(null);
@@ -30,7 +30,7 @@ const FilterSection = ({ startDate, setStartDate, handlePreviousDay, handleNextD
         console.log(data);  // Log the response for debugging
         setResponse(data);  // Set the response in state to display it in the UI
         console.log("DATA "+  response);
-
+        handleApiResponse(data)
       })
       .catch((error) => {
         console.error('Error fetching the API:', error);

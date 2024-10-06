@@ -1,12 +1,13 @@
 import React from 'react';
 
 const CharacterizationTable = ({ characterization }) => {
+  // Ensure characterization is not null or undefined before using it
   const rows = [
-    { protocol: 'MAnycast ICMPv6', data: characterization.MAnycastICMPv6 },
-    { protocol: 'MAnycast TCPv6', data: characterization.MAnycastTCPv6 },
-    { protocol: 'MAnycast UDPv6', data: characterization.MAnycastUDPv6 },
-    { protocol: 'iGreedy ICMPv6', data: characterization.iGreedyICMPv6 },
-    { protocol: 'iGreedy TCPv6', data: characterization.iGreedyTCPv6 }
+    { protocol: 'MAnycast ICMPv6', data: characterization?.MAnycastICMPv6 },
+    { protocol: 'MAnycast TCPv6', data: characterization?.MAnycastTCPv6 },
+    { protocol: 'MAnycast UDPv6', data: characterization?.MAnycastUDPv6 },
+    { protocol: 'iGreedy ICMPv6', data: characterization?.iGreedyICMPv6 },
+    { protocol: 'iGreedy TCPv6', data: characterization?.iGreedyTCPv6 }
   ];
 
   return (
@@ -22,8 +23,8 @@ const CharacterizationTable = ({ characterization }) => {
         {rows.map((row, index) => (
           <tr key={index}>
             <td>{row.protocol}</td>
-            <td>{row.data.anycast ? 'Yes' : 'No'}</td>
-            <td>{row.data.instances}</td>
+            <td>{row.data?.anycast !== undefined ? (row.data.anycast ? 'Yes' : 'No') : 'N/A'}</td>
+            <td>{row.data?.instances ?? 'N/A'}</td>
           </tr>
         ))}
       </tbody>

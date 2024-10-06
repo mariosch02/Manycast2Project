@@ -1,41 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FilterSection from './FilterSection';
 import MapView from './MapView';
 import TableView from './TableView';
 import GeneralInfo from './GeneralInfo';
 import "./App.css";
 
-// useEffect(() => {
-//   fetch('http://localhost:5000/api/data')
-//       .then(response => response.text()) 
-//       .then(text => setData(text))
-//       .catch(error => console.error('Error fetching data:', error));
-// }, []);
-
-
-
-const anycastSites = {
-  prefix: "2001:1218:600d::/48",
-  count: 3,
-  characterization: {
-    MAnycastICMPv6: { anycast: true, instances: 2 },
-    MAnycastTCPv6: { anycast: true, instances: 2 },
-    MAnycastUDPv6: { anycast: null, instances: 0 },
-    iGreedyICMPv6: { anycast: false, instances: 1 },
-    iGreedyTCPv6: { anycast: false, instances: 1 },
-  },
-  instances: [
-    { city: "Paris", code_country: "FR", id: "LBG", position: [48.8566, 2.3522] },
-    { city: "New York", code_country: "US", id: "NYC", position: [40.7128, -74.0060] },
-    { city: "Tokyo", code_country: "JP", id: "TYO", position: [35.6895, 139.6917] }
-  ]
-};
-
 const App = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
   const [view, setView] = useState("map");
-  const [anycastInstances, setAnycastInstances] = useState([])
+  const [dataResponse, setDataResponse] = useState(null);
+  const [anycastSites, setAnycastSites] = useState({
+    prefix: "",
+    count: 0,
+    characterization: {},
+    instances: []
+  });
 
   const handleNextDay = () => {
     const nextDay = new Date(startDate);
@@ -49,10 +29,32 @@ const App = () => {
     setStartDate(previousDay);
   };
 
-  // const handleSearch = () => {
-  //   setStartDate
-  //   setSearchTerm
-  // }
+  useEffect(() => {
+    if (dataResponse && dataResponse.length > 0) {
+      console.log("Ouuu Thkiaole ", dataResponse); // This will log when the state changes
+
+      const newAnycastSites = {
+        prefix: dataResponse[0].Prefix,
+        count: dataResponse[0].Count, // Assuming there is a Count property in dataResponse
+        characterization: {
+          MAnycastICMPv6: { anycast: dataResponse[0].MAnycast_ICMPv6, instances: dataResponse[0].MAnycast_ICMPv6_Count },
+          MAnycastTCPv6: { anycast: dataResponse[0].MAnycast_TCPv6, instances: dataResponse[0].MAnycast_TCPv6_Count },
+          MAnycastUDPv6: { anycast: dataResponse[0].MAnycast_UDPv6, instances: dataResponse[0].MAnycast_UDPv6_Count },
+          iGreedyICMPv6: { anycast: dataResponse[0].iGreedyICMPv6, instances: dataResponse[0].iGreedyICMPv6_Count },
+          iGreedyTCPv6: { anycast: dataResponse[0].iGreedyTCPv6, instances: dataResponse[0].iGreedyTCPv6_Count }
+        },
+        instances: dataResponse.map((item) => ({
+          city: item.City,
+          code_country: item.CodeCountry,
+          id: item.Id,
+          position: [item.Latitude, item.Longitude]
+        }))
+      };
+
+      setAnycastSites(newAnycastSites);
+      console.log("Ouuu Thkiaole ", newAnycastSites.instances[0].position[0]); // This will log the city of the first instance
+    }
+  }, [dataResponse]);
 
   return (
     <div className="container">
@@ -65,10 +67,20 @@ const App = () => {
         setSearchTerm={setSearchTerm}
         view={view}
         setView={setView}
+        handleApiResponse={setDataResponse}
       />
       <div className="content">
-        {view === "map" ? <MapView instances={anycastSites.instances} /> : <TableView instances={anycastSites.instances} />}
-        <GeneralInfo startDate={startDate} prefix={anycastSites.prefix} count={anycastSites.count} characterization={anycastSites.characterization} />
+        {view === "map" ? (
+          <MapView instances={anycastSites.instances} />
+        ) : (
+          <TableView instances={anycastSites.instances} />
+        )}
+        <GeneralInfo
+          startDate={startDate}
+          prefix={anycastSites.prefix}
+          count={anycastSites.count}
+          characterization={anycastSites.characterization}
+        />
       </div>
     </div>
   );

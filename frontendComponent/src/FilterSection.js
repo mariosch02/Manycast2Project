@@ -21,7 +21,7 @@ const FilterSection = ({ startDate, setStartDate, handlePreviousDay, handleNextD
   const formattedDate = formatDate(startDate);
 
   const handleSearchClick = () => {
-    const apiUrl = `http://localhost:5000/api/ipv6/${formattedDate}/${searchTerm}`;
+    const apiUrl = `http://localhost:5000/api/ipv4/${formattedDate}/${searchTerm}`;
     fetch(apiUrl)
       .then((res) => res.json()) 
       .then((data) => {

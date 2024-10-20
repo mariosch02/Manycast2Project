@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from "react";
-import FilterSection from './FilterSection';
-import MapView from './MapView';
-import TableView from './TableView';
-import GeneralInfo from './GeneralInfo';
+import { useSearchParams } from "react-router-dom";
+import FilterSection from "./FilterSection";
+import MapView from "./MapView";
+import TableView from "./TableView";
+import GeneralInfo from "./GeneralInfo";
 import "./App.css";
 
 const App = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams] = useSearchParams();
+  const initialDate = searchParams.get("date") || new Date().toISOString().split("T")[0];
+  const initialPrefix = searchParams.get("prefix") || "";
+  const [startDate, setStartDate] = useState(new Date(initialDate));
+  const [searchTerm, setSearchTerm] = useState(initialPrefix);
   const [view, setView] = useState("map");
   const [dataResponse, setDataResponse] = useState(null);
   const [anycastSites, setAnycastSites] = useState({
     prefix: "",
     count: 0,
     characterization: {},
-    instances: []
+    instances: [],
   });
 
   const handleNextDay = () => {
@@ -31,28 +35,25 @@ const App = () => {
 
   useEffect(() => {
     if (dataResponse && dataResponse.length > 0) {
-      console.log("Ouuu Thkiaole ", dataResponse); 
-
       const newAnycastSites = {
         prefix: dataResponse[0].Prefix,
-        count: dataResponse[0].Count, 
+        count: dataResponse[0].Count,
         characterization: {
-          MAnycastICMPv6: { anycast: dataResponse[0].MAnycast_ICMPv6, instances: dataResponse[0].MAnycast_ICMPv6_Count },
-          MAnycastTCPv6: { anycast: dataResponse[0].MAnycast_TCPv6, instances: dataResponse[0].MAnycast_TCPv6_Count },
-          MAnycastUDPv6: { anycast: dataResponse[0].MAnycast_UDPv6, instances: dataResponse[0].MAnycast_UDPv6_Count },
-          iGreedyICMPv6: { anycast: dataResponse[0].iGreedyICMPv6, instances: dataResponse[0].iGreedyICMPv6_Count },
-          iGreedyTCPv6: { anycast: dataResponse[0].iGreedyTCPv6, instances: dataResponse[0].iGreedyTCPv6_Count }
+          MAnycastICMPv6: { anycast: dataResponse[0].MAnycast_ICMPv4, instances: dataResponse[0].MAnycast_ICMPv4_Count },
+          MAnycastTCPv6: { anycast: dataResponse[0].MAnycast_TCPv4, instances: dataResponse[0].MAnycast_TCPv4_Count },
+          MAnycastUDPv6: { anycast: dataResponse[0].MAnycast_UDPv4, instances: dataResponse[0].MAnycast_UDPv4_Count },
+          iGreedyICMPv6: { anycast: dataResponse[0].iGreedyICMPv4, instances: dataResponse[0].iGreedyICMPv4_Count },
+          iGreedyTCPv6: { anycast: dataResponse[0].iGreedyTCPv4, instances: dataResponse[0].iGreedyTCPv4_Count },
         },
         instances: dataResponse.map((item) => ({
           city: item.City,
           code_country: item.CodeCountry,
           id: item.Id,
-          position: [item.Latitude, item.Longitude]
-        }))
+          position: [item.Latitude, item.Longitude],
+        })),
       };
 
       setAnycastSites(newAnycastSites);
-      console.log("Ouuu Thkiaole ", newAnycastSites.instances[0].position[0]); 
     }
   }, [dataResponse]);
 

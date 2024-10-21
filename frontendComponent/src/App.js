@@ -34,25 +34,50 @@ const App = () => {
   };
 
   useEffect(() => {
+    var newAnycastSites = null
     if (dataResponse && dataResponse.length > 0) {
-      const newAnycastSites = {
-        prefix: dataResponse[0].Prefix,
-        count: dataResponse[0].Count,
-        characterization: {
-          MAnycastICMPv6: { anycast: dataResponse[0].MAnycast_ICMPv4, instances: dataResponse[0].MAnycast_ICMPv4_Count },
-          MAnycastTCPv6: { anycast: dataResponse[0].MAnycast_TCPv4, instances: dataResponse[0].MAnycast_TCPv4_Count },
-          MAnycastUDPv6: { anycast: dataResponse[0].MAnycast_UDPv4, instances: dataResponse[0].MAnycast_UDPv4_Count },
-          iGreedyICMPv6: { anycast: dataResponse[0].iGreedyICMPv4, instances: dataResponse[0].iGreedyICMPv4_Count },
-          iGreedyTCPv6: { anycast: dataResponse[0].iGreedyTCPv4, instances: dataResponse[0].iGreedyTCPv4_Count },
-        },
-        instances: dataResponse.map((item) => ({
-          city: item.City,
-          code_country: item.CodeCountry,
-          id: item.Id,
-          position: [item.Latitude, item.Longitude],
-        })),
-      };
+        // if IP is ipv6
 
+        if (dataResponse[0].Prefix.includes(":")) {
+          newAnycastSites = {
+            prefix: dataResponse[0].Prefix,
+            count: dataResponse[0].Count,
+            characterization: {
+              MAnycastICMPv6: { anycast: dataResponse[0].MAnycast_ICMPv6, instances: dataResponse[0].MAnycast_ICMPv6_Count },
+              MAnycastTCPv6: { anycast: dataResponse[0].MAnycast_TCPv6, instances: dataResponse[0].MAnycast_TCPv6_Count },
+              MAnycastUDPv6: { anycast: dataResponse[0].MAnycast_UDPv6, instances: dataResponse[0].MAnycast_UDPv6_Count },
+              iGreedyICMPv6: { anycast: dataResponse[0].iGreedyICMPv6, instances: dataResponse[0].iGreedyICMPv6_Count },
+              iGreedyTCPv6: { anycast: dataResponse[0].iGreedyTCPv6, instances: dataResponse[0].iGreedyTCPv6_Count },
+            },
+            instances: dataResponse.map((item) => ({
+              city: item.City,
+              code_country: item.CodeCountry,
+              id: item.Id,
+              position: [item.Latitude, item.Longitude],
+            })),
+          };
+      }
+      // if IP is ipv4
+        else {
+          console.log("mpenw dame?")
+          newAnycastSites = {
+            prefix: dataResponse[0].Prefix,
+            count: dataResponse[0].Count,
+            characterization: {
+              MAnycastICMPv4: { anycast: dataResponse[0].MAnycast_ICMPv4, instances: dataResponse[0].MAnycast_ICMPv4_Count },
+              MAnycastTCPv4: { anycast: dataResponse[0].MAnycast_TCPv4, instances: dataResponse[0].MAnycast_TCPv4_Count },
+              MAnycastUDPv4: { anycast: dataResponse[0].MAnycast_UDPv4, instances: dataResponse[0].MAnycast_UDPv4_Count },
+              iGreedyICMPv4: { anycast: dataResponse[0].iGreedyICMPv4, instances: dataResponse[0].iGreedyICMPv4_Count },
+              iGreedyTCPv4: { anycast: dataResponse[0].iGreedyTCPv4, instances: dataResponse[0].iGreedyTCPv4_Count },
+            },
+            instances: dataResponse.map((item) => ({
+              city: item.City,
+              code_country: item.CodeCountry,
+              id: item.Id,
+              position: [item.Latitude, item.Longitude],
+            })),
+          };
+      }
       setAnycastSites(newAnycastSites);
     }
   }, [dataResponse]);

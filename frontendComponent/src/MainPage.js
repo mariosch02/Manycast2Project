@@ -13,6 +13,10 @@ const MainPage = () => {
   const [dateRange, setDateRange] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const [lastdate, setLastDate] = useState("")
+
+
+ 
 
   useEffect(() => {
     const generateRandomStats = (startDate, endDate, maxDaysIncrement) => {
@@ -23,6 +27,23 @@ const MainPage = () => {
         "iGreedyTCPv6"
       ];
 
+
+      const fetchLastDate = async () => {
+        try {
+          const response = await fetch('http://localhost:5000/api/stats/last');
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.json();
+          setLastDate(data); // Set the fetched data into state
+        } catch (error) {
+          console.error('Error fetching the API:', error);
+          setLastDate({ error: 'Failed to fetch data' }); // Set error message in state
+        }
+      };
+  
+      fetchLastDate(); // Call the async function inside the useEffect
+    
       let stats = {};
       let currentDate = new Date(startDate);
 
@@ -45,7 +66,24 @@ const MainPage = () => {
     const endDate = "2024-11-01";
     const maxDaysIncrement = 1;
     
-    setStatistics(generateRandomStats(startDate, endDate, maxDaysIncrement));
+    const apiUrl = 'http://localhost:5000/api/stats';
+
+    fetch(apiUrl)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setStatistics(data); // Update state with fetched data
+      })
+      .catch((error) => {
+        console.error('Error fetching the API:', error); // Handle any errors from the fetch call
+      });
+  
+
+
   }, []);
 
   const protocolColors = {
@@ -292,7 +330,7 @@ const MainPage = () => {
         </thead>
         <tbody>
           {Object.keys(statistics).length > 0 
-            ? Object.entries(statistics[Object.keys(statistics)[0]]).map(([protocol, count]) => (
+            ? Object.entries(statistics[lastDate]).map(([protocol, count]) => (
               <tr key={protocol}>
                 <td style={styles.td}>{protocol}</td>
                 <td style={styles.td}>{count}</td>

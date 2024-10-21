@@ -41,23 +41,28 @@ def close_database_connection(connection):
 def get_or_insert_ipid(prefix, cursor, connection, ip_cache):
     """Retrieve the IPID for a given prefix from cache or database, or insert it if it doesn't exist."""
     if prefix in ip_cache:
+        print("Test Cachce")
         return ip_cache[prefix]
 
     try:
         logging.info(f"Looking up IPID for prefix: {prefix}")
         cursor.execute("SELECT IPID FROM IPAddresses WHERE Prefix = %s", (prefix,))
         result = cursor.fetchone()
-
+        print(f"Type: {result}")
         if result:
-            ipid = result[0]  # Use an integer index here if result is a tuple
+            print(f"Eimai dame {result.get('IPID')}")
+            ipid = result.get('IPID') # Use an integer index here if result is a tuple
         else:
+            print("skata")
             cursor.execute("INSERT IGNORE INTO IPAddresses (Prefix) VALUES (%s)", (prefix,))
             connection.commit()
             cursor.execute("SELECT IPID FROM IPAddresses WHERE Prefix = %s", (prefix,))
             result = cursor.fetchone()
-            ipid = result[0]  # Use an integer index again
+            ipid = result.get('IPID')  # Use an integer index again
 
         ip_cache[prefix] = ipid  # Cache the IPID for this prefix
+        print("return")
+        print(ipid)
         return ipid
 
     except Error as e:
@@ -65,7 +70,37 @@ def get_or_insert_ipid(prefix, cursor, connection, ip_cache):
         return None
 
 
+def get_or_insert_location_ipid(prefix, cursor, connection, ip_cache):
+    """Retrieve the IPID for a given prefix from cache or database, or insert it if it doesn't exist."""
+    cursor = connection.cursor(dictionary=True)
+    if prefix in ip_cache:
+        print("Test Cachce")
+        return ip_cache[prefix]
 
+    try:
+        logging.info(f"Looking up IPID for prefix: {prefix}")
+        cursor.execute("SELECT IPID FROM IPAddresses WHERE Prefix = %s", (prefix,))
+        result = cursor.fetchone()
+        print(f"Type: {result}")
+        if result:
+            print(f"Eimai dame {result.get('IPID')}")
+            ipid = result["IPID"] # Use an integer index here if result is a tuple
+        else:
+            print("skata")
+            cursor.execute("INSERT IGNORE INTO IPAddresses (Prefix) VALUES (%s)", (prefix,))
+            connection.commit()
+            cursor.execute("SELECT IPID FROM IPAddresses WHERE Prefix = %s", (prefix,))
+            result = cursor.fetchone()
+            ipid =result["IPID"]  # Use an integer index again
+
+        ip_cache[prefix] = ipid  # Cache the IPID for this prefix
+        print("return")
+        print(ipid)
+        return ipid
+
+    except Error as e:
+        logging.error(f"Error getting or inserting IPID for {prefix}: {e}")
+        return None
 
 
 
@@ -76,82 +111,6 @@ def close_connection(connection):
 
 
 
-def update_cloned_repo(repo_path, repo_url):
-    """Clone or update the repository."""
-    try:
-        if not os.path.exists(repo_path):
-            logging.info(f"Cloning repository from {repo_url} to {repo_path}...")
-            git.Repo.clone_from(repo_url, repo_path)
-            logging.info(f"Repository cloned successfully at {repo_path}")
-        else:
-            logging.info(f"Repository exists. Pulling the latest changes at {repo_path}...")
-            repo = git.Repo(repo_path)
-            repo.git.fetch()
-            repo.git.reset('--hard', 'origin/main')
-            logging.info(f"Repository updated at {repo_path}")
-    except Exception as e:
-        logging.error(f"Error updating repository: {e}")
-
-
-
-def process_file(file_path):
-    """Processes a single file and inserts its data into the database."""
-    fileTracker_path = "file-tracker"
-    logging.info(f"Starting processing of file: {file_path}")
-    connection = connect_to_database()
-    
-    if connection is None:
-        logging.error(f"Skipping file {file_path} due to database connection failure.")
-        return
-
-    cursor = connection.cursor()
-
-    try:
-        filename = os.path.basename(file_path)
-
-        # Handle stats.txt as a plain text file
-        if "stats" in filename:
-            year = file_path[17:21] 
-            month = file_path[22:24]
-            day = file_path[25:27]  
-            date = year + "-" + month + "-" + day
-            logging.info(f"Processing stats file: {file_path}")
-            with open(file_path, 'r') as file:
-                stats_data = file.read()  # Read the entire file as plain text
-            insert_stats(stats_data, date, cursor, connection)  # Insert stats into the database       
-        else:
-            date = filename[:10]  # Extract date from the filename
-            # Handle JSON files (IPv4, IPv6, locations)
-            with open(file_path, 'r') as file:
-                json_data = json.load(file)  # Load the JSON data
-
-            version = filename[11:13]  # Extract version (v4 or v6)
-            location = len(filename) > 18  # Determine if it's a location file based on filename length
-
-            # Process IPv4, IPv6, and location data
-            if not location and version == "v4":
-                logging.info(f"Inserting IPv4 data from {file_path}")
-                insert_data_v4(json_data, date, cursor, connection)
-            elif not location and version == "v6":
-                logging.info(f"Inserting IPv6 data from {file_path}")
-                insert_data_v6(json_data, date, cursor, connection)
-            elif location and version == "v4":
-                logging.info(f"Inserting IPv4 location data from {file_path}")
-                insert_location_v4(json_data, date, cursor, connection)
-            elif location and version == "v6":
-                logging.info(f"Inserting IPv6 location data from {file_path}")
-                insert_location_v6(json_data, date, cursor, connection)
-        connection.commit()
-        logging.info(f"Successfully processed and committed file: {file_path}")
-    except mysql.connector.Error as err:
-        logging.error(f"Error processing file {file_path}: {err}")
-    except json.JSONDecodeError as e:
-        logging.error(f"Error reading JSON file {file_path}: {e}")
-    except Exception as e:
-        logging.error(f"An unexpected error occurred with file {file_path}: {e}")
-    finally:
-        cursor.close()
-        close_database_connection(connection)
 
 def getLastDate():
     try:
@@ -160,7 +119,7 @@ def getLastDate():
         # Execute the query to get the most recent record from the IPv4 table
         cursor.execute("""
             SELECT Date
-            FROM LocationIPv6
+            FROM IPv6
             ORDER BY Date DESC
         """)
         # Last Date
@@ -186,11 +145,11 @@ def getMissingData(db, start_date):
     print("This is called")
     while current_date <= today:
         date_str = current_date.strftime("%Y-%m-%d")
-        fetch_github_data_v4(date_str)
-        fetch_github_data_location_v4(date_str)
+        # fetch_github_data_v4(date_str)
+        # fetch_github_data_location_v4(date_str)
         fetch_github_data_v6(date_str)
-        fetch_github_data_location_v6(date_str)
-        fetch_github_stats(date_str)
+        # fetch_github_data_location_v6(date_str)
+        # fetch_github_stats(date_str)
         current_date += timedelta(days=1)
 
 
@@ -328,40 +287,6 @@ def fetch_github_data_location_v6(date_str):
 
 
 
-def update_daily_database_multiprocessing(num_processes=4, timeout=5000):
-    """Updates the daily database using multiprocessing with a timeout for the pool."""
-    TEST_LOCAL_REPO_PATH = './anycast-census/'
-    fileTracker_path = './file-tracker'
-    logging.info(f"Looking for JSON files in directory: {TEST_LOCAL_REPO_PATH}")
-    files_to_process = []
-    stats_to_process = []
-    for dirpath, dirnames, filenames in os.walk(TEST_LOCAL_REPO_PATH):
-        for filename in filenames:
-            if filename.endswith(".json") or filename == "stats":
-                file_path = os.path.join(dirpath, filename)
-                files_to_process.append(file_path)
-
-    total_files = len(files_to_process)
-    logging.info(f"Found {total_files} JSON files to process.")
-    start_time = time.time()
-
-    try:
-        with Pool(num_processes) as pool:
-            result = pool.map_async(process_file, files_to_process)
-            result_stats = pool.map
-
-            result.wait(timeout)
-
-            if not result.successful():
-                logging.error("Not all files processed successfully. Check logs for details.")
-
-    except Exception as e:
-        logging.error(f"An error occurred during multiprocessing: {e}")
-    finally:
-        elapsed_time = time.time() - start_time
-        logging.info(f"Processing completed in {elapsed_time:.2f} seconds.")
-
-
 def insert_stats(stats_data, date, cursor, connection):
     """
     Inserts the statistics data from the stats file into the Stats table.
@@ -409,7 +334,7 @@ def insert_stats(stats_data, date, cursor, connection):
 
 
 
-def insert_data_v4(json_data, date, cursor, connection, batch_size=100):
+def insert_data_v4(json_data, date, cursor, connection, batch_size=500):
     """Inserts IPv4 data into the database in batches."""
     sql_insert_query = """
         INSERT INTO IPv4(
@@ -429,27 +354,27 @@ def insert_data_v4(json_data, date, cursor, connection, batch_size=100):
     """
     records_to_insert = []
     ip_cache = {}
-    print("Test")
     for ipv4 in json_data:
         # print("malaka " + str(ipv4["characterization"]))
         prefix = ipv4["prefix"]
         print("ALL PREFIX " + prefix)
         ipid = get_or_insert_ipid(prefix, cursor, connection, ip_cache)
-        print("Test")
         print(ipid)
-        # if ipid is None:
-        #     print("Traoule")
-        #     continue
+        if ipid is None:
+            print("Traoule")
+            continue
+        print("malaka")
+        print(ipv4["characterization"])
         values = (
             int(ipid),
-            str(ipv4["characterization"]["MAnycast_ICMPv4"].get("anycast")),
-            str(ipv4["characterization"]["MAnycast_TCPv4"].get("anycast")),
-            str(ipv4["characterization"]["MAnycast_UDPv4"].get("anycast")),
+            str(ipv4["characterization"]["MAnycastICMPv4"].get("anycast")),
+            str(ipv4["characterization"]["MAnycastTCPv4"].get("anycast")),
+            str(ipv4["characterization"]["MAnycastUDPv4"].get("anycast")),
             str(ipv4["characterization"]["iGreedyICMPv4"].get("anycast")),
             str(ipv4["characterization"]["iGreedyTCPv4"].get("anycast")),
-            str(ipv4["characterization"]["MAnycast_ICMPv4"].get("instances")),
-            str(ipv4["characterization"]["MAnycast_TCPv4"].get("instances")),
-            str(ipv4["characterization"]["MAnycast_UDPv4"].get("instances")),
+            str(ipv4["characterization"]["MAnycastICMPv4"].get("instances")),
+            str(ipv4["characterization"]["MAnycastTCPv4"].get("instances")),
+            str(ipv4["characterization"]["MAnycastUDPv4"].get("instances")),
             str(ipv4["characterization"]["iGreedyICMPv4"].get("instances")),
             str(ipv4["characterization"]["iGreedyTCPv4"].get("instances")),
             date
@@ -502,14 +427,14 @@ def insert_data_v6(json_data, date, cursor, connection, batch_size=100):
 
         values = (
             int(ipid),
-            str(ipv6["characterization"]["MAnycast_ICMPv6"].get("anycast")),
-            str(ipv6["characterization"]["MAnycast_TCPv6"].get("anycast")),
-            str(ipv6["characterization"]["MAnycast_UDPv6"].get("anycast")),
+            str(ipv6["characterization"]["MAnycastICMPv6"].get("anycast")),
+            str(ipv6["characterization"]["MAnycastTCPv6"].get("anycast")),
+            str(ipv6["characterization"]["MAnycastUDPv6"].get("anycast")),
             str(ipv6["characterization"]["iGreedyICMPv6"].get("anycast")),
             str(ipv6["characterization"]["iGreedyTCPv6"].get("anycast")),
-            str(ipv6["characterization"]["MAnycast_ICMPv6"].get("instances")),
-            str(ipv6["characterization"]["MAnycast_TCPv6"].get("instances")),
-            str(ipv6["characterization"]["MAnycast_UDPv6"].get("instances")),
+            str(ipv6["characterization"]["MAnycastICMPv6"].get("instances")),
+            str(ipv6["characterization"]["MAnycastTCPv6"].get("instances")),
+            str(ipv6["characterization"]["MAnycastUDPv6"].get("instances")),
             str(ipv6["characterization"]["iGreedyICMPv6"].get("instances")),
             str(ipv6["characterization"]["iGreedyTCPv6"].get("instances")),
             date
@@ -554,7 +479,7 @@ def insert_location_v4(json_data, date, batch_size=250):
         logging.info("Starting batch insert...")
         for entry in json_data:
             prefix = entry["prefix"]
-            ipid = get_or_insert_ipid(prefix, cursor, connection, ip_cache)
+            ipid = get_or_insert_location_ipid(prefix, cursor, connection, ip_cache)
 
             if ipid is None:
                 continue
@@ -631,7 +556,7 @@ def insert_location_v6(json_data, date, batch_size=250):
         logging.info("Starting batch insert...")
         for entry in json_data:
             prefix = entry["prefix"]
-            ipid = get_or_insert_ipid(prefix, cursor, connection, ip_cache)
+            ipid = get_or_insert_location_ipid(prefix, cursor, connection, ip_cache)
 
             if ipid is None:
                 continue

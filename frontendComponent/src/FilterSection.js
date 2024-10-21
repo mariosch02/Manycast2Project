@@ -21,7 +21,16 @@ const FilterSection = ({ startDate, setStartDate, handlePreviousDay, handleNextD
   const formattedDate = formatDate(startDate);
 
   const handleSearchClick = () => {
-    const apiUrl = `http://localhost:5000/api/ipv4/${formattedDate}/${searchTerm}`;
+    console.log("Search Term " + searchTerm)
+    var apiUrl = "";
+    http://localhost:5000/api/ipv6/2023-10-21?prefix=2620:49:4::/48
+
+    if (searchTerm.includes(":")) {
+      apiUrl = `http://localhost:5000/api/ipv6/${formattedDate}?prefix=${searchTerm}`;
+    }
+    else {
+      apiUrl = `http://localhost:5000/api/ipv4/${formattedDate}?prefix=${searchTerm}`;
+    }
     fetch(apiUrl)
       .then((res) => res.json()) 
       .then((data) => {
